@@ -21,7 +21,7 @@ export default async function handler(req, res) {
     const filePath = path.join(
       process.cwd(),
       "data",
-      `chapter_${chapterNumber}_verses.json`
+      `chapter_${chapterNumber}_optimized.json`
     );
 
     const content = await fs.readFile(filePath, "utf8");
