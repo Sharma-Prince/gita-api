@@ -50,7 +50,7 @@ app.get("/api/chapter/:id", async (req, res) => {
     const filePath = path.join(
       process.cwd(),
       "data",
-      `chapter_${chapterId}_verses.json`
+      `chapter_${chapterId}_optimized.json`
     );
 
     const fileContent = await fs.readFile(filePath, "utf8");
@@ -72,34 +72,3 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
 
-app.get("/api/chapter/:chapterId/verse/:verseId", async (req, res) => {
-  try {
-    const { chapterId, verseId } = req.params;
-
-    const filePath = path.join(
-      process.cwd(),
-      "data",
-      `chapter_${chapterId}_verses.json`
-    );
-
-    const fileContent = await fs.readFile(filePath, "utf8");
-    const verses = JSON.parse(fileContent);
-
-    const verse = verses.find(
-      v => Number(v.verse_number) === Number(verseId)
-    );
-
-    if (!verse) {
-      return res.status(404).json({
-        error: "Verse not found"
-      });
-    }
-
-    res.json(verse);
-
-  } catch (error) {
-    res.status(404).json({
-      error: "Chapter not found"
-    });
-  }
-});
