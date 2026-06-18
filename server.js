@@ -3,22 +3,27 @@ import fs from "fs/promises";
 import path from "path";
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-// Home Route
+/**
+ * Home Route
+ */
 app.get("/", (req, res) => {
   res.json({
-    message: "Bhagavad Gita API",
-    endpoints: [
-      "/api/chapters",
-      "/api/chapter/1",
-      "/api/chapter/2",
-      "/api/chapter/18"
-    ]
+    name: "Bhagavad Gita API",
+    version: "1.0.0",
+    endpoints: {
+      allChapters: "/api/chapters",
+      chapter1: "/api/chapter/1",
+      chapter2: "/api/chapter/2",
+      chapter18: "/api/chapter/18"
+    }
   });
 });
 
-// List all chapters
+/**
+ * List all chapters
+ */
 app.get("/api/chapters", (req, res) => {
   const chapters = [];
 
@@ -32,7 +37,9 @@ app.get("/api/chapters", (req, res) => {
   res.json(chapters);
 });
 
-// Get chapter JSON
+/**
+ * Get Chapter JSON
+ */
 app.get("/api/chapter/:id", async (req, res) => {
   try {
     const chapterId = parseInt(req.params.id);
@@ -43,6 +50,7 @@ app.get("/api/chapter/:id", async (req, res) => {
       chapterId > 18
     ) {
       return res.status(400).json({
+        success: false,
         error: "Chapter number must be between 1 and 18"
       });
     }
@@ -53,22 +61,49 @@ app.get("/api/chapter/:id", async (req, res) => {
       `chapter_${chapterId}_optimized.json`
     );
 
+    console.log(`Reading file: ${filePath}`);
+
     const fileContent = await fs.readFile(filePath, "utf8");
 
-    // Return JSON file directly
-    res.json(JSON.parse(fileContent));
+    const chapterData = JSON.parse(fileContent);
+
+    return res.status(200).json(chapterData);
 
   } catch (error) {
-    console.error(error);
+    console.error("ERROR:", error);
 
-    res.status(404).json({
-      error: "Chapter file not found"
+    return res.status(404).json({
+      success: false,
+      error: error.message
     });
   }
 });
 
-// Start Server
+/**
+ * Debug Route
+ * Shows files available inside data folder
+ */
+app.get("/debug", async (req, res) => {
+  try {
+    const files = await fs.readdir(
+      path.join(process.cwd(), "data")
+    );
+
+    res.json({
+      totalFiles: files.length,
+      files
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
+/**
+ * Start Server
+ */
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
-
