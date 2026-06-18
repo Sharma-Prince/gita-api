@@ -1,8 +1,5 @@
 {
   "name": "gita-api",
-  "version": "1.0.0",
-  "type": "module",
-  "dependencies": {
-    "express": "^5.1.0"
-  }
+  "version": "3.0.0",
+  "type": "module"
 }
